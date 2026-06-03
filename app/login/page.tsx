@@ -36,6 +36,24 @@ export default async function LoginPage() {
           <p className="text-sm text-teal-100/80 leading-relaxed">
             Verify orders, estimate pricing in INR, and leverage real-time unit conversions. Simply professional.
           </p>
+
+          <div className="rounded-[6px] bg-white p-5 text-slate-800 border border-slate-100 shadow-xl space-y-3.5 mt-6">
+            <h3 className="text-xs font-black text-teal-800 uppercase tracking-widest">Test Credentials</h3>
+            <div className="space-y-2.5 text-[11px] font-semibold font-mono text-slate-600">
+              <div className="flex flex-col sm:flex-row sm:justify-between border-b border-slate-100 pb-1.5 gap-1">
+                <span className="text-slate-400 uppercase text-[9px] font-bold">Admin:</span>
+                <span className="text-slate-800">admin@gmail.com <span className="text-slate-300 font-sans mx-1">|</span> admin@123</span>
+              </div>
+              <div className="flex flex-col sm:flex-row sm:justify-between border-b border-slate-100 pb-1.5 gap-1">
+                <span className="text-slate-400 uppercase text-[9px] font-bold">Seller:</span>
+                <span className="text-slate-800">seller@gmail.com <span className="text-slate-300 font-sans mx-1">|</span> seller@123</span>
+              </div>
+              <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
+                <span className="text-slate-400 uppercase text-[9px] font-bold">Buyer:</span>
+                <span className="text-slate-800">buyer@gmail.com <span className="text-slate-300 font-sans mx-1">|</span> buyer@123</span>
+              </div>
+            </div>
+          </div>
         </div>
 
         <div className="relative z-10 text-xs text-teal-200/60 font-medium">
