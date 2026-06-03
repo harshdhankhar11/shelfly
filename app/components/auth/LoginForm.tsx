@@ -44,6 +44,8 @@ export default function LoginForm() {
           router.push("/admin");
         } else if (role === "SELLER") {
           router.push("/seller");
+        } else if (role === "BUYER") {
+          router.push("/buyer");
         } else {
           router.push("/dashboard");
         }
@@ -56,8 +58,8 @@ export default function LoginForm() {
   };
 
   const handleUseDemo = () => {
-    setEmail("admin@shelfly.com");
-    setPassword("admin123");
+    setEmail("admin@gmail.com");
+    setPassword("admin@123");
   };
 
   return (
@@ -145,16 +147,17 @@ export default function LoginForm() {
         <Link href="/register" className="block text-xs font-semibold text-gray-600 hover:text-primary transition-colors">
           Don&apos;t have an account? Create new account
         </Link>
-        
+
         <div className="pt-2">
           <button
+            type="button"
             onClick={handleUseDemo}
             className="inline-flex rounded-[6px] bg-indigo-50 border border-indigo-100 px-3 py-1.5 text-xs font-medium text-indigo-700 hover:bg-indigo-100 transition-colors"
           >
             Use Demo Credentials
           </button>
           <p className="text-[10px] text-gray-400 mt-1">
-            admin@shelfly.com / admin123 (Verified Admin Account)
+            admin@gmail.com / admin@123 (Verified Admin Account)
           </p>
         </div>
       </div>

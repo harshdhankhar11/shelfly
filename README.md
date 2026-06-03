@@ -20,6 +20,7 @@ Shelfly is a Next.js web application designed to help businesses manage product 
 * **Backend**: Next.js Route Handlers (API endpoints).
 * **Database**: Neon Serverless PostgreSQL.
 * **ORM (Object-Relational Mapping)**: Prisma with pg adapter support.
+* **Redis**: For storing OTPs 
 * **Authentication**: NextAuth.js (Session security).
 * **State & Forms**: React Hook Form with Zod validation.
 
@@ -67,9 +68,9 @@ Use the following logins to test the role capabilities of each panel:
 
 | Role | Email | Password |
 | :--- | :--- | :--- |
-| **Admin** | `admin@gmail.com` | `admin123` |
-| **Seller** | `seller@gmail.com` | `seller123` |
-| **Buyer** | `buyer@gmail.com` | `buyer123` |
+| **Admin** | `admin@gmail.com` | `admin@123` |
+| **Seller** | `seller@gmail.com` | `seller@123` |
+| **Buyer** | `buyer@gmail.com` | `buyer@123` |
 
 ---
 
@@ -115,7 +116,7 @@ Follow these steps to run the project on your machine:
    NEXTAUTH_SECRET="any-random-long-string-for-auth"
    NEXTAUTH_URL="http://localhost:3000"
    
-   # Optional: Redis URL for caching (if using Upstash)
+   # Optional: Redis URL for storing otps
    REDIS_URL="your-redis-url"
    
    # Optional: Email Service Credentials

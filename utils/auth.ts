@@ -28,8 +28,13 @@ export const authOptions: NextAuthOptions = {
             },
             async authorize(credentials) {
                 if (!credentials?.email || !credentials.password) {
+                    console.warn("[auth][credentials] Missing email or password in authorize callback");
                     return null;
                 }
+
+                console.log("[auth][credentials] authorize called", {
+                    email: credentials.email,
+                });
 
                 const user = await prisma.user.findUnique({
                     where: {
@@ -46,17 +51,35 @@ export const authOptions: NextAuthOptions = {
                     },
                 });
 
-                if (!user || user.accountStatus !== "ACTIVE") {
+                if (!user) {
+                    console.warn("[auth][credentials] No user found for email", credentials.email);
+                    return null;
+                }
+
+                if (user.accountStatus !== "ACTIVE") {
+                    console.warn("[auth][credentials] User is not active", {
+                        email: credentials.email,
+                        userId: user.id,
+                        accountStatus: user.accountStatus,
+                    });
                     return null;
                 }
 
                 if (user.emailVerified === false) {
+                    console.warn("[auth][credentials] User email is not verified", {
+                        email: credentials.email,
+                        userId: user.id,
+                    });
                     throw new Error("EMAIL_NOT_VERIFIED");
                 }
 
                 const passwordMatches = await compare(credentials.password, user.passwordHash);
 
                 if (!passwordMatches) {
+                    console.warn("[auth][credentials] Password mismatch", {
+                        email: credentials.email,
+                        userId: user.id,
+                    });
                     return null;
                 }
 
@@ -67,6 +90,12 @@ export const authOptions: NextAuthOptions = {
                     data: {
                         lastLoginAt: new Date(),
                     },
+                });
+
+                console.log("[auth][credentials] Login succeeded", {
+                    email: user.email,
+                    userId: user.id,
+                    role: user.role,
                 });
 
                 return {

@@ -8,14 +8,22 @@ export default async function LoginPage() {
   const session = await auth();
 
   if (session) {
-    redirect("/dashboard");
+    if (session.user.role === "ADMIN") {
+      redirect("/admin");
+    }
+
+    if (session.user.role === "SELLER") {
+      redirect("/seller");
+    }
+
+    redirect("/buyer");
   }
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 min-h-screen w-screen overflow-hidden bg-slate-50">
       <div className="hidden lg:flex flex-col justify-between bg-teal-800 p-12 text-white relative overflow-hidden">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,var(--tw-gradient-stops))] from-teal-700 via-teal-800 to-teal-950 opacity-90" />
-        
+
         <div className="relative z-10 flex items-center gap-2">
           <div className="flex h-9 w-9 items-center justify-center rounded-[6px] bg-white text-teal-800">
             <Box className="h-5 w-5" />
