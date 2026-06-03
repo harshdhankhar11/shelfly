@@ -57,10 +57,10 @@ export async function POST(req: NextRequest) {
 
     const userId = session.user.id;
     const body = await req.json();
-    const { items, customerNotes, paymentMethod } = body;
+    const { items, customerNotes, paymentMethod, isQuotation } = body;
 
     if (!items || !Array.isArray(items) || items.length === 0) {
-      return NextResponse.json({ error: "Order must contain at least one item" }, { status: 400 });
+       return NextResponse.json({ error: "Order must contain at least one item" }, { status: 400 });
     }
 
     const productIds = items.map((i) => i.productId);
@@ -124,14 +124,15 @@ export async function POST(req: NextRequest) {
           orderNumber,
           userId,
           status: "PENDING",
+          isQuotation: isQuotation === true,
           subtotal: calculatedSubtotal,
           tax,
           discount,
           total,
           customerNotes: customerNotes || null,
-          paymentStatus: "PAID",
-          paymentMethod: paymentMethod || "CARD",
-          paidAt: new Date(),
+          paymentStatus: isQuotation === true ? "UNPAID" : "PAID",
+          paymentMethod: isQuotation === true ? null : (paymentMethod || "CARD"),
+          paidAt: isQuotation === true ? null : new Date(),
         },
       });
 

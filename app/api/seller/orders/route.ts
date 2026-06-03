@@ -78,7 +78,7 @@ export async function POST(req: NextRequest) {
 
     const userId = session.user.id;
     const body = await req.json();
-    const { items, customerNotes } = body;
+    const { items, customerNotes, isQuotation } = body;
 
     if (!items || !Array.isArray(items) || items.length === 0) {
       return NextResponse.json({ error: "Order items are required" }, { status: 400 });
@@ -150,6 +150,7 @@ export async function POST(req: NextRequest) {
           orderNumber,
           userId,
           status: "PENDING",
+          isQuotation: isQuotation === true,
           subtotal,
           tax,
           discount,
