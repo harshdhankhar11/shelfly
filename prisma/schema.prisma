@@ -1,0 +1,227 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum UserRole {
+  ADMIN
+  SELLER
+  BUYER
+}
+
+enum AccountStatus {
+  ACTIVE
+  SUSPENDED
+  INACTIVE
+}
+
+enum OrderStatus {
+  DRAFT
+  PENDING
+  CONFIRMED
+  SHIPPED
+  DELIVERED
+  CANCELLED
+  REJECTED
+}
+
+enum PaymentStatus {
+  UNPAID
+  PAID
+  REFUNDED
+  PARTIALLY_PAID
+}
+
+enum ProductUnit {
+  GRAM
+  KILOGRAM
+  LITER
+  MILLILITER
+  PIECE
+  ITEMS
+}
+
+enum UnitType {
+  WEIGHT
+  VOLUME
+  COUNT
+}
+
+model User {
+  id            String        @id @default(uuid())
+  email         String        @unique
+  passwordHash  String
+  fullName      String
+  phone         String?
+  role          UserRole      @default(SELLER)
+  emailVerified Boolean       @default(false)
+  accountStatus AccountStatus @default(ACTIVE)
+  lastLoginAt   DateTime?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  orders         Order[]
+  products       Product[]      @relation("ProductCreatedBy")
+  inventory      Inventory[]
+  activityLogs   ActivityLog[]
+  approvedOrders Order[]        @relation("OrderApprovedBy")
+  notifications  Notification[]
+
+  @@index([email])
+  @@index([role])
+  @@index([accountStatus])
+}
+
+model Product {
+  id          String  @id @default(uuid())
+  sku         String  @unique
+  name        String
+  description String?
+  category    String?
+  imageUrl    String?
+
+  baseUnit     ProductUnit
+  baseUnitType UnitType
+  basePrice    Decimal     @db.Decimal(20, 6)
+
+  currentStock  Decimal  @default(0) @db.Decimal(20, 6)
+  minStockLevel Decimal? @db.Decimal(20, 6)
+  maxStockLevel Decimal? @db.Decimal(20, 6)
+
+  conversionFactors Json
+
+  isActive Boolean @default(true)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  createdById String?
+
+  createdBy  User?       @relation("ProductCreatedBy", fields: [createdById], references: [id])
+  orderItems OrderItem[]
+  inventory  Inventory[]
+
+  @@index([sku])
+  @@index([name])
+  @@index([category])
+  @@index([isActive])
+  @@index([baseUnit])
+}
+
+model Inventory {
+  id          String   @id @default(uuid())
+  productId   String
+  quantity    Decimal  @db.Decimal(20, 6)
+  stockBefore Decimal  @db.Decimal(20, 6)
+  stockAfter  Decimal  @db.Decimal(20, 6)
+  reason      String
+  referenceId String?
+  userId      String
+  createdAt   DateTime @default(now())
+
+  product Product @relation(fields: [productId], references: [id])
+  user    User    @relation(fields: [userId], references: [id])
+
+  @@index([productId])
+  @@index([userId])
+  @@index([createdAt])
+  @@index([reason])
+}
+
+model Order {
+  id          String @id @default(uuid())
+  orderNumber String @unique
+  userId      String
+
+  status             OrderStatus @default(PENDING)
+  isQuotation        Boolean     @default(false)
+  quotationExpiresAt DateTime?
+
+  subtotal Decimal @db.Decimal(20, 6)
+  tax      Decimal @default(0) @db.Decimal(20, 6)
+  discount Decimal @default(0) @db.Decimal(20, 6)
+  total    Decimal @db.Decimal(20, 6)
+
+  customerNotes String?
+  adminNotes    String?
+
+  paymentStatus PaymentStatus @default(UNPAID)
+  paymentMethod String?
+  paidAt        DateTime?
+
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  approvedById String?
+  approvedAt   DateTime?
+
+  user       User        @relation(fields: [userId], references: [id])
+  items      OrderItem[]
+  approvedBy User?       @relation("OrderApprovedBy", fields: [approvedById], references: [id])
+
+  @@index([orderNumber])
+  @@index([userId])
+  @@index([status])
+  @@index([paymentStatus])
+  @@index([createdAt])
+  @@index([isQuotation])
+}
+
+model OrderItem {
+  id        String @id @default(uuid())
+  orderId   String
+  productId String
+
+  orderedUnit     ProductUnit
+  orderedQuantity Decimal     @db.Decimal(20, 6)
+
+  baseQuantity Decimal @db.Decimal(20, 6)
+
+  unitPrice  Decimal @db.Decimal(20, 6)
+  totalPrice Decimal @db.Decimal(20, 6)
+
+  conversionUsed Json
+
+  order   Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id])
+
+  @@unique([orderId, productId])
+  @@index([orderId])
+  @@index([productId])
+}
+
+model ActivityLog {
+  id         String   @id @default(uuid())
+  userId     String
+  action     String
+  entityType String
+  entityId   String
+  oldValue   Json?
+  newValue   Json?
+  ipAddress  String?
+  userAgent  String?
+  createdAt  DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([entityType, entityId])
+  @@index([createdAt])
+  @@index([action])
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String
+  message   String
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([isRead])
+  @@index([createdAt])
+}
